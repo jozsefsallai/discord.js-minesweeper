@@ -23,7 +23,7 @@
     "node": ">=8.0.0"
   },
   "files": [
-    "./lib"
+    "/lib"
   ],
   "homepage": "https://github.com/jozsefsallai/discord.js-minesweeper",
   "keywords": [
