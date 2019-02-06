@@ -1,0 +1,46 @@
+{
+  "name": "discord.js-minesweeper",
+  "version": "1.0.0",
+  "description": "Generate Minesweeper mine fields using Discord's spoiler tags.",
+  "main": "./lib/index.js",
+  "repository": "jozsefsallai/discord.js-minesweeper",
+  "bugs": "https://github.com/jozsefsallai/discord.js-minesweeper/issues",
+  "author": "József Sallai @jozsefsallai",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4",
+    "@types/mocha": "^5",
+    "@types/node": "^10",
+    "chai": "^4",
+    "coveralls": "^3.0.0",
+    "mocha": "^5",
+    "nyc": "^12",
+    "ts-node": "^7",
+    "tslint": "^5",
+    "typescript": "^3.3.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "./lib"
+  ],
+  "homepage": "https://github.com/jozsefsallai/discord.js-minesweeper",
+  "keywords": [
+    "discord",
+    "discord.js",
+    "minesweeper",
+    "bot",
+    "discord bot",
+    "generator"
+  ],
+  "scripts": {
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "lint": "tslint --project .",
+    "prepack": "rm -rf lib && tsc",
+    "prepare": "rm -rf lib && tsc",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "test:cover": "nyc --reporter=lcov --reporter=text npm run test"
+  },
+  "types": "lib/Minesweeper.d.ts"
+}
