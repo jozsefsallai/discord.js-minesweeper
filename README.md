@@ -1,6 +1,20 @@
 # Discord.js Minesweeper
 
-A Minesweeper generator library for Discord.
+A Minesweeper generator library for Discord. **See it in action [here](https://jozsefsallai.github.io/discord-minesweeper-generator/)!**
+
+[![Build Status](https://travis-ci.org/jozsefsallai/discord.js-minesweeper.svg)](https://travis-ci.org/jozsefsallai/discord.js-minesweeper) [![Coverage Status](https://coveralls.io/repos/github/jozsefsallai/discord.js-minesweeper/badge.svg?branch=master)](https://coveralls.io/github/jozsefsallai/discord.js-minesweeper?branch=master) [![Package Size](https://img.shields.io/bundlephobia/min/discord.js-minesweeper.svg?style=flat)](https://bundlephobia.com/result?p=discord.js-minesweeper) [![npm version](https://img.shields.io/npm/v/discord.js-minesweeper.svg?style=flat)](https://www.npmjs.com/package/discord.js-minesweeper)
+
+## Table of Contents
+
+* [Advantages](#advantages)
+* [Usage](#usage)
+  - [Options](#options)
+  - [Returned Data](#returned-data)
+* [Methods](#methods)
+* [Examples](#examples)
+  - [Discord.js](#discordjs)
+  - [Commando](#commando)
+* [License](#license)
 
 ## Advantages
 
@@ -60,6 +74,49 @@ Based on the specified `returnType`, the returned data can vary.
   * `'matrix'` - the matrix array itself.
 
 If a mine field is not possible with the provided data (i.e. too many mines), it will return `null`. 
+
+## Methods
+
+### `start()`
+
+Generates a minesweeper mine field and returns it.
+
+#### Returns
+  * **string** - A Discord-interpretable message.
+  * **string[][]** - A matrix of the generated Minesweeper field.
+  * **null** - If it's not possible to generate a Minesweeper field using the provided data.
+
+### `spoilerize(str)`
+
+Turns a text into a Discord spoiler.
+
+#### Params
+  * **string** `str` - The string to spoilerize.
+
+#### Returns
+  * **string** - A Discord-interpretable spoiler containing the provided text.
+
+### `getNumberOfMines(x, y)`
+
+Gets the number of mines in a particular (x, y) coordinate of the matrix.
+
+#### Params
+  * **number** `x` - The x coordinate (row).
+  * **number** `y` - The y coordinate (column).
+
+#### Returns
+  * **string** - The number of mines surrounding the provided cell in the format of a spoilerized emoji.
+
+### `getTextRepresentation()`
+
+Returns the Discord message equivalent of the mine field.
+
+#### Returns
+  * **string** - A Discord-interpretable message.
+
+---
+
+*Note: the methods `generateEmptyMatrix()` and `plantMines()` are for internal use and should not be used outside the module. Using any of these could alter the generated matrix in unexpected ways. Don't use them in your app unless you know what you're doing.*
 
 ## Examples
 
@@ -154,4 +211,4 @@ module.exports = MinesweeperCommand;
 
 ## License
 
-MIT.
+Licensed under MIT. Check [LICENSE](https://github.com/jozsefsallai/discord.js-minesweeper/blob/master/LICENSE) for more information.
