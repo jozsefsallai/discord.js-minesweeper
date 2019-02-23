@@ -14,7 +14,6 @@ A Minesweeper generator library for Discord. **See it in action [here](https://j
 * [Examples](#examples)
   - [Discord.js](#discordjs)
   - [Commando](#commando)
-* [License](#license)
 
 ## Advantages
 
@@ -208,5 +207,3 @@ class MinesweeperCommand extends Command {
 
 module.exports = MinesweeperCommand;
 ```
-
-
