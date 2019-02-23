@@ -2,7 +2,7 @@
 
 A Minesweeper generator library for Discord. **See it in action [here](https://jozsefsallai.github.io/discord-minesweeper-generator/)!**
 
-[![Build Status](https://travis-ci.org/jozsefsallai/discord.js-minesweeper.svg)](https://travis-ci.org/jozsefsallai/discord.js-minesweeper) [![Coverage Status](https://coveralls.io/repos/github/jozsefsallai/discord.js-minesweeper/badge.svg?branch=master)](https://coveralls.io/github/jozsefsallai/discord.js-minesweeper?branch=master) [![Package Size](https://img.shields.io/bundlephobia/min/discord.js-minesweeper.svg?style=flat)](https://bundlephobia.com/result?p=discord.js-minesweeper) [![npm version](https://img.shields.io/npm/v/discord.js-minesweeper.svg?style=flat)](https://www.npmjs.com/package/discord.js-minesweeper)
+[![Build Status](https://travis-ci.org/jozsefsallai/discord.js-minesweeper.svg)](https://travis-ci.org/jozsefsallai/discord.js-minesweeper) [![Coverage Status](https://coveralls.io/repos/github/jozsefsallai/discord.js-minesweeper/badge.svg?branch=master)](https://coveralls.io/github/jozsefsallai/discord.js-minesweeper?branch=master) [![Package Size](https://img.shields.io/bundlephobia/min/discord.js-minesweeper.svg?style=flat)](https://bundlephobia.com/result?p=discord.js-minesweeper) [![npm version](https://img.shields.io/npm/v/discord.js-minesweeper.svg?style=flat)](https://www.npmjs.com/package/discord.js-minesweeper) [![https://img.shields.io/badge/license-MIT-lightgrey.svg](https://github.com/jozsefsallai/discord.js-minesweeper/blob/master/LICENSE)
 
 ## Table of Contents
 
@@ -209,6 +209,4 @@ class MinesweeperCommand extends Command {
 module.exports = MinesweeperCommand;
 ```
 
-## License
 
-Licensed under MIT. Check [LICENSE](https://github.com/jozsefsallai/discord.js-minesweeper/blob/master/LICENSE) for more information.
