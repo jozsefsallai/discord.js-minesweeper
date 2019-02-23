@@ -42,5 +42,8 @@
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "test:cover": "nyc --reporter=lcov --reporter=text npm run test"
   },
-  "types": "lib/Minesweeper.d.ts"
+  "types": "lib/Minesweeper.d.ts",
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  }
 }
