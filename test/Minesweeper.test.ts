@@ -174,26 +174,6 @@ describe('Minesweeper', function () {
 
         return expect(target.startsWith('||')).to.be.false;
       });
-
-      it('should add extra space when spaces are enabled', function () {
-        const minesweeper = new Minesweeper({
-          rows: 5,
-          columns: 5,
-          mines: 6,
-          revealFirstCell: true
-        });
-        minesweeper.generateEmptyMatrix();
-        minesweeper.plantMines();
-        minesweeper.populate();
-
-        const revealed = minesweeper.revealFirst();
-        const x: number = revealed.x;
-        const y: number = revealed.y;
-
-        const target: string = minesweeper.matrix[x][y];
-
-        return expect(target.startsWith('  ')).to.be.true;
-      });
     });
   });
 

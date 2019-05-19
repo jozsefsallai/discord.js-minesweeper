@@ -1,6 +1,6 @@
 {
   "name": "discord.js-minesweeper",
-  "version": "1.0.4",
+  "version": "1.0.4b",
   "description": "Generate Minesweeper mine fields using Discord's spoiler tags.",
   "main": "./lib/Minesweeper.js",
   "repository": "jozsefsallai/discord.js-minesweeper",

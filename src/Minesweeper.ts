@@ -198,9 +198,7 @@ class Minesweeper {
 
     const cell = this.matrix[x][y];
 
-    this.matrix[x][y] = this.spaces
-      ? ` ${cell.slice(2, -2)} `
-      : cell.slice(2, -2);
+    this.matrix[x][y] = cell.slice(2, -2);
 
     return { x, y };
   }
