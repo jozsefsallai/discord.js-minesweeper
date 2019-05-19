@@ -5,6 +5,7 @@
  * @property {number} [columns] - The number of columns in the mine field. Defaults to 9.
  * @property {number} [mines] - The number of mines in the mine field. Defaults to 10.
  * @property {string} [emote] - The emote used as a mine. Defaults to "boom".
+ * @property {boolean} [revealFirstCell] - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
  * @property {boolean} [spaces] - Specifies whether or not the emojis should be surrounded by spaces. Defaults to true.
  * @property {'emoji' | 'code' | 'matrix'} - The type of the returned data. Defaults to "emoji".
  */
@@ -13,6 +14,7 @@ interface MinesweeperOpts {
   columns?: number;
   mines?: number;
   emote?: string;
+  revealFirstCell?: boolean;
   spaces?: boolean;
   returnType?: 'emoji' | 'code' | 'matrix'; 
 }
@@ -28,12 +30,25 @@ interface CellTypes {
   numbers: string[];
 }
 
+/**
+ * Safe cell. Defines the coordinates of a safe cell.
+ * @typedef {object}SafeCell
+ * @property {number} x - row id
+ * @property {number} y - column id
+ */
+interface SafeCell {
+  x: number;
+  y: number;
+}
+
 class Minesweeper {
   public readonly rows: number;
   public readonly columns: number;
   public readonly mines: number;
   public readonly emote: string;
   public readonly spaces: boolean;
+  public readonly revealFirstCell: boolean;
+  public readonly safeCells: SafeCell[] = [];
   public readonly returnType: 'emoji' | 'code' | 'matrix';
   public readonly types: CellTypes;
   public matrix: string[][];
@@ -48,6 +63,7 @@ class Minesweeper {
     this.columns = (opts && opts.columns) || 9;
     this.mines = (opts && opts.mines) || 10;
     this.emote = (opts && opts.emote) || 'boom';
+    this.revealFirstCell = opts && opts.revealFirstCell !== undefined ? opts.revealFirstCell : false;
     this.spaces = opts && opts.spaces !== undefined ? opts.spaces : true;
     this.returnType = (opts && opts.returnType) || 'emoji';
 
@@ -108,6 +124,8 @@ class Minesweeper {
       return this.types.mine;
     }
 
+    this.safeCells.push({ x, y });
+
     let counter: number = 0;
     const hasLeft = y > 0;
     const hasRight = y < (this.columns - 1);
@@ -151,6 +169,43 @@ class Minesweeper {
   }
 
   /**
+   * Populates the matrix.
+   */
+  populate() {
+    this.matrix = this.matrix.map((row, x) => {
+      return row.map((col, y) => this.getNumberOfMines(x, y));
+    });
+  }
+
+  /**
+   * Reveal a random cell.
+   * @returns {SafeCell}
+   */
+  revealFirst(): SafeCell {
+    /**
+     * Thanks to @FungiOfDeath and @TheSorton on Github for
+     * bringing this up!
+     */
+
+    if (!this.revealFirstCell) {
+      return { x: -1, y: -1 };
+    }
+
+    const safeCell: SafeCell = this.safeCells[Math.floor(Math.random() * this.safeCells.length)];
+
+    const x: number = safeCell.x;
+    const y: number = safeCell.y;
+
+    const cell = this.matrix[x][y];
+
+    this.matrix[x][y] = this.spaces
+      ? ` ${cell.slice(2, -2)} `
+      : cell.slice(2, -2);
+
+    return { x, y };
+  }
+
+  /**
    * Generates a minesweeper mine field and returns it.
    * @returns {(string | string[][] | null)}
    */
@@ -160,12 +215,9 @@ class Minesweeper {
     }
 
     this.generateEmptyMatrix();
-
     this.plantMines();
-
-    this.matrix = this.matrix.map((row, x) => {
-      return row.map((col, y) => this.getNumberOfMines(x, y));
-    });
+    this.populate();
+    this.revealFirst();
 
     switch (this.returnType) {
       case 'emoji':

@@ -64,6 +64,7 @@ minesweeper.start();
   * **mines** *(number)* - The number of mines in the mine field. Defaults to 10.
   * **emote** *(string)* - The emote used as a mine (without colons). Defaults to "boom".
   * **spaces** *(boolean)* - Specifies whether or not the emojis should be surrounded by spaces. Defaults to true.
+  * **revealFirstCell** *(boolean)* - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
   * **returnType** *(string)* - The type of the returned data.
 
 ### Returned Data
@@ -113,6 +114,17 @@ Returns the Discord message equivalent of the mine field.
 
 #### Returns
   * **string** - A Discord-interpretable message.
+
+### `populate()`
+
+Populates the matrix with mine counts.
+
+### `revealFirst()`
+
+Reveal a random cell.
+
+#### Returns
+  * **SafeCell** - the x and y coordinates of the revealed cell.
 
 ---
 

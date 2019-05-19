@@ -10,9 +10,11 @@ describe('Minesweeper', function () {
       expect(minesweeper.mines).to.eql(10);
       expect(minesweeper.emote).to.eql('boom');
       expect(minesweeper.spaces).to.eql(true);
+      expect(minesweeper.revealFirstCell).to.eql(false);
       expect(minesweeper.returnType).to.eql('emoji');
       expect(minesweeper.types.mine).to.eql('|| :boom: ||');
       expect(minesweeper.types.numbers[1]).to.eql('|| :one: ||');
+      expect(minesweeper.safeCells).to.be.empty;
     });
 
     it('should set custom props', function () {
@@ -21,7 +23,8 @@ describe('Minesweeper', function () {
         columns: 10,
         mines: 20,
         emote: 'tada',
-        spaces: false
+        spaces: false,
+        revealFirstCell: true
       });
 
       expect(minesweeper.rows).to.eql(20);
@@ -29,6 +32,7 @@ describe('Minesweeper', function () {
       expect(minesweeper.mines).to.eql(20);
       expect(minesweeper.emote).to.eql('tada');
       expect(minesweeper.spaces).to.eql(false);
+      expect(minesweeper.revealFirstCell).to.eql(true);
       expect(minesweeper.types.mine).to.eql('||:tada:||');
       expect(minesweeper.types.numbers[1]).to.eql('||:one:||');
     });
@@ -109,6 +113,87 @@ describe('Minesweeper', function () {
 
       const output = '||:zero:||||:zero:||\n||:zero:||||:zero:||';
       return expect(minesweeper.getTextRepresentation()).to.eql(output);
+    });
+  });
+
+  describe('#populate', function () {
+    function countNonMines(matrix: string[][]): number {
+      let counter: number = 0;
+
+      matrix.forEach(row => {
+        row.forEach(column => {
+          if (column !== '||:boom:||') {
+            counter++;
+          }
+        });
+      });
+
+      return counter;
+    }
+
+    it('should populate the board', function () {
+      const minesweeper = new Minesweeper({ rows: 3, columns: 3, mines: 1, spaces: false });
+      minesweeper.generateEmptyMatrix();
+      minesweeper.plantMines();
+      minesweeper.populate();
+
+      const nonMines = countNonMines(minesweeper.matrix);
+      return expect(nonMines).to.eql(8);
+    });
+  });
+
+  describe('#revealFirst', function () {
+    describe('when revealFirstCell is false', function () {
+      it('should return null', function () {
+        const minesweeper = new Minesweeper({ rows: 2, columns: 2, mines: 1 });
+        return expect(minesweeper.revealFirst()).to.eql({
+          x: -1,
+          y: -1
+        });
+      });
+    });
+
+    describe('when revealFirstCell is true', function () {
+      it('should change a random field', function () {
+        const minesweeper = new Minesweeper({
+          rows: 5,
+          columns: 5,
+          mines: 6,
+          revealFirstCell: true,
+          spaces: false
+        });
+        minesweeper.generateEmptyMatrix();
+        minesweeper.plantMines();
+        minesweeper.populate();
+
+        const revealed = minesweeper.revealFirst();
+        const x: number = revealed.x;
+        const y: number = revealed.y;
+
+        const target: string = minesweeper.matrix[x][y];
+
+        return expect(target.startsWith('||')).to.be.false;
+      });
+
+      it('should add extra space when spaces are enabled', function () {
+        const minesweeper = new Minesweeper({
+          rows: 5,
+          columns: 5,
+          mines: 6,
+          revealFirstCell: true
+        });
+        minesweeper.generateEmptyMatrix();
+        minesweeper.plantMines();
+        minesweeper.populate();
+
+        const revealed = minesweeper.revealFirst();
+        const x: number = revealed.x;
+        const y: number = revealed.y;
+
+        const target: string = minesweeper.matrix[x][y];
+
+        return expect(target.startsWith('  ')).to.be.true;
+      });
     });
   });
 
