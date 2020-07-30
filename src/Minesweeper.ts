@@ -195,8 +195,8 @@ class Minesweeper {
       return { x: -1, y: -1 };
     }
 
-    if (this.zeroFirstCell) {
-      const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] == this.types.numbers[0]);
+    const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] == this.types.numbers[0]);
+    if (this.zeroFirstCell && zeroCells.length > 0) {
       const safeCell: SafeCell = zeroCells[Math.floor(Math.random() * zeroCells.length)];
 
       const x: number = safeCell.x;
