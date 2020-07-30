@@ -195,7 +195,7 @@ class Minesweeper {
       return { x: -1, y: -1 };
     }
 
-    const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] == this.types.numbers[0]);
+    const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] === this.types.numbers[0]);
     if (this.zeroFirstCell && zeroCells.length > 0) {
       const safeCell: SafeCell = zeroCells[Math.floor(Math.random() * zeroCells.length)];
 
@@ -241,7 +241,7 @@ class Minesweeper {
     for (let i = xLower; i <= xUpper; i++) {
       for (let j = yLower; j <= yUpper; j++) {
         if (isSpoiler(i, j)) {
-          if (this.matrix[i][j] == this.types.numbers[0]) {
+          if (this.matrix[i][j] === this.types.numbers[0]) {
             zeroCells.push({ x: i, y: j });
           }
           this.matrix[i][j] = this.matrix[i][j].slice(2, -2);
@@ -249,7 +249,9 @@ class Minesweeper {
       }
     }
 
-    if (recurse) zeroCells.forEach(c => this.revealSurroundings(c, true));
+    if (recurse) {
+      zeroCells.forEach(c => this.revealSurroundings(c, true));
+    }
   }
 
   /**
