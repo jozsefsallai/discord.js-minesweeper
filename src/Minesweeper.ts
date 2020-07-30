@@ -6,6 +6,7 @@
  * @property {number} [mines] - The number of mines in the mine field. Defaults to 10.
  * @property {string} [emote] - The emote used as a mine. Defaults to "boom".
  * @property {boolean} [revealFirstCell] - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
+ * @property {boolean} [zeroFirstCell] - Whether or not the first cell revealed should always be a zero (and automatically reveal any surrounding safe cells). Does nothing if `revealFirstCell` is false. Defaults to true.
  * @property {boolean} [spaces] - Specifies whether or not the emojis should be surrounded by spaces. Defaults to true.
  * @property {'emoji' | 'code' | 'matrix'} - The type of the returned data. Defaults to "emoji".
  */
@@ -15,6 +16,7 @@ interface MinesweeperOpts {
   mines?: number;
   emote?: string;
   revealFirstCell?: boolean;
+  zeroFirstCell?: boolean;
   spaces?: boolean;
   returnType?: 'emoji' | 'code' | 'matrix'; 
 }
@@ -48,6 +50,7 @@ class Minesweeper {
   public readonly emote: string;
   public readonly spaces: boolean;
   public readonly revealFirstCell: boolean;
+  public readonly zeroFirstCell: boolean;
   public readonly safeCells: SafeCell[] = [];
   public readonly returnType: 'emoji' | 'code' | 'matrix';
   public readonly types: CellTypes;
@@ -64,6 +67,7 @@ class Minesweeper {
     this.mines = (opts && opts.mines) || 10;
     this.emote = (opts && opts.emote) || 'boom';
     this.revealFirstCell = opts && opts.revealFirstCell !== undefined ? opts.revealFirstCell : false;
+    this.zeroFirstCell = opts && opts.zeroFirstCell !== undefined ? opts.zeroFirstCell : true;
     this.spaces = opts && opts.spaces !== undefined ? opts.spaces : true;
     this.returnType = (opts && opts.returnType) || 'emoji';
 
@@ -191,16 +195,61 @@ class Minesweeper {
       return { x: -1, y: -1 };
     }
 
-    const safeCell: SafeCell = this.safeCells[Math.floor(Math.random() * this.safeCells.length)];
+    if (this.zeroFirstCell) {
+      const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] == this.types.numbers[0]);
+      const safeCell: SafeCell = zeroCells[Math.floor(Math.random() * zeroCells.length)];
 
-    const x: number = safeCell.x;
-    const y: number = safeCell.y;
+      const x: number = safeCell.x;
+      const y: number = safeCell.y;
 
-    const cell = this.matrix[x][y];
+      const cell = this.matrix[x][y];
 
-    this.matrix[x][y] = cell.slice(2, -2);
+      this.matrix[x][y] = cell.slice(2, -2);
+      this.revealSurroundings(safeCell);
 
-    return { x, y };
+      return { x, y };
+    } else {
+      const safeCell: SafeCell = this.safeCells[Math.floor(Math.random() * this.safeCells.length)];
+
+      const x: number = safeCell.x;
+      const y: number = safeCell.y;
+
+      const cell = this.matrix[x][y];
+
+      this.matrix[x][y] = cell.slice(2, -2);
+
+      return { x, y };
+    }
+  }
+
+  /**
+   * Reveals all cells surrounding a cell. Only meant to be used for zero-cells during initial construction.
+   * @param {SafeCell} c - A SafeCell to reveal around. This should only be a zero-cell!
+   * @param {boolean} recurse - Whether to recursively reveal following zero-cells. Defaults to true.
+   */
+  revealSurroundings(c: SafeCell, recurse: boolean = true) {
+    const isSpoiler = (x: number, y: number) => this.matrix[x][y].includes("||");
+    const x = c.x;
+    const y = c.y;
+
+    const xLower = Math.max(0, x - 1);
+    const yLower = Math.max(0, y - 1);
+    const xUpper = Math.min(this.rows - 1, x + 1);
+    const yUpper = Math.min(this.columns - 1, y + 1);
+    let zeroCells: SafeCell[] = [];
+
+    for (let i = xLower; i <= xUpper; i++) {
+      for (let j = yLower; j <= yUpper; j++) {
+        if (isSpoiler(i, j)) {
+          if (this.matrix[i][j] == this.types.numbers[0]) {
+            zeroCells.push({ x: i, y: j });
+          }
+          this.matrix[i][j] = this.matrix[i][j].slice(2, -2);
+        }
+      }
+    }
+
+    if (recurse) zeroCells.forEach(c => this.revealSurroundings(c, true));
   }
 
   /**
