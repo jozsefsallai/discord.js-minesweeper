@@ -11,6 +11,7 @@ describe('Minesweeper', function () {
       expect(minesweeper.emote).to.eql('boom');
       expect(minesweeper.spaces).to.eql(true);
       expect(minesweeper.revealFirstCell).to.eql(false);
+      expect(minesweeper.zeroFirstCell).to.eql(true);
       expect(minesweeper.returnType).to.eql('emoji');
       expect(minesweeper.types.mine).to.eql('|| :boom: ||');
       expect(minesweeper.types.numbers[1]).to.eql('|| :one: ||');
@@ -143,6 +144,20 @@ describe('Minesweeper', function () {
   });
 
   describe('#revealFirst', function () {
+    function countRevealedCells(matrix: string[][]): number {
+      let counter: number = 0;
+
+      matrix.forEach(row => {
+        row.forEach(column => {
+          if (!column.includes('||')) {
+            counter++;
+          }
+        });
+      });
+
+      return counter;
+    }
+
     describe('when revealFirstCell is false', function () {
       it('should return null', function () {
         const minesweeper = new Minesweeper({ rows: 2, columns: 2, mines: 1 });
@@ -154,25 +169,193 @@ describe('Minesweeper', function () {
     });
 
     describe('when revealFirstCell is true', function () {
-      it('should change a random field', function () {
-        const minesweeper = new Minesweeper({
-          rows: 5,
-          columns: 5,
-          mines: 6,
-          revealFirstCell: true,
-          spaces: false
+      describe('when zeroFirstCell is false', function() {
+        it('should change a random field', function () {
+          const minesweeper = new Minesweeper({
+            rows: 5,
+            columns: 5,
+            mines: 6,
+            revealFirstCell: true,
+            zeroFirstCell: false,
+            spaces: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
+
+          const revealed = minesweeper.revealFirst();
+          const x: number = revealed.x;
+          const y: number = revealed.y;
+
+          const target: string = minesweeper.matrix[x][y];
+
+          return expect(target.startsWith('||')).to.be.false;
         });
-        minesweeper.generateEmptyMatrix();
-        minesweeper.plantMines();
-        minesweeper.populate();
+      });
 
-        const revealed = minesweeper.revealFirst();
-        const x: number = revealed.x;
-        const y: number = revealed.y;
+      describe('when zeroFirstCell is true', function() {
+        it('should change a zero field when one exists', function () {
+          const minesweeper = new Minesweeper({
+            rows: 4,
+            columns: 4,
+            mines: 2,
+            revealFirstCell: true,
+            zeroFirstCell: true,
+            spaces: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
 
-        const target: string = minesweeper.matrix[x][y];
+          const revealed = minesweeper.revealFirst();
+          const x: number = revealed.x;
+          const y: number = revealed.y;
 
-        return expect(target.startsWith('||')).to.be.false;
+          const target: string = minesweeper.matrix[x][y];
+
+          expect(target.startsWith('||')).to.be.false;
+          expect(target).to.eql(':zero:');
+        });
+
+        it('should reveal multiple fields when a zero field exists', function () {
+          const minesweeper = new Minesweeper({
+            rows: 4,
+            columns: 4,
+            mines: 2,
+            revealFirstCell: true,
+            zeroFirstCell: true,
+            spaces: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
+
+          minesweeper.revealFirst();
+          const revealed: number = countRevealedCells(minesweeper.matrix);
+
+          expect(revealed).to.be.greaterThan(1);
+        });
+
+        it('should only change one field when no zero fields exist', function () {
+          const minesweeper = new Minesweeper({
+            rows: 2,
+            columns: 2,
+            mines: 1,
+            revealFirstCell: true,
+            zeroFirstCell: true,
+            spaces: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
+
+          minesweeper.revealFirst();
+          const revealed: number = countRevealedCells(minesweeper.matrix);
+
+          expect(revealed).to.eql(1);
+        });
+      });
+
+    });
+  });
+
+  describe('#revealSurroundings', function () {
+    function countHiddenCells(matrix: string[][]): number {
+      let counter: number = 0;
+
+      matrix.forEach(row => {
+        row.forEach(column => {
+          if (column.includes('||')) {
+            counter++;
+          }
+        });
+      });
+
+      return counter;
+    }
+
+    describe('when there are no mines', function() {
+      describe('when recurse is false', function() {
+        it('should result in nine revealed cells', function () {
+          const minesweeper = new Minesweeper({
+            rows: 5,
+            columns: 5,
+            mines: 0,
+            revealFirstCell: false
+          });
+          minesweeper.generateEmptyMatrix();
+
+          minesweeper.revealSurroundings({x: 2, y: 2}, false);
+          const totalCells: number = minesweeper.rows * minesweeper.columns;
+          const hidden: number = countHiddenCells(minesweeper.matrix);
+
+          expect(totalCells - hidden).to.eql(9);
+        });
+      });
+
+      describe('when recurse is true', function() {
+        it('should result in no hidden cells ', function () {
+          const minesweeper = new Minesweeper({
+            rows: 5,
+            columns: 5,
+            mines: 0,
+            revealFirstCell: false
+          });
+          minesweeper.generateEmptyMatrix();
+
+          minesweeper.revealSurroundings({x: 2, y: 2}, true);
+          const hidden: number = countHiddenCells(minesweeper.matrix);
+
+          expect(hidden).to.eql(0);
+        });
+      });
+    });
+
+    describe('when there are mines', function() {
+      describe('when recurse is true', function() {
+        function isZeroCell(cell: {x: number, y: number}, minesweeper: Minesweeper): boolean {
+          if (minesweeper.matrix[cell.x][cell.y] == minesweeper.types.numbers[0]) {
+            return true;
+          }
+          return false;
+        }
+
+        it('should reveal multiple cells', function () {
+          const minesweeper = new Minesweeper({
+            rows: 5,
+            columns: 5,
+            mines: 1,
+            revealFirstCell: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
+
+          const zeroCell = minesweeper.safeCells.filter(c => isZeroCell(c, minesweeper))[0]
+          minesweeper.revealSurroundings(zeroCell, true);
+          const totalCells: number = minesweeper.rows * minesweeper.columns;
+          const hidden: number = countHiddenCells(minesweeper.matrix);
+
+          expect(hidden).to.be.lessThan(totalCells);
+        })
+
+        it('should leave some cells hidden', function () {
+          const minesweeper = new Minesweeper({
+            rows: 5,
+            columns: 5,
+            mines: 1,
+            revealFirstCell: false
+          });
+          minesweeper.generateEmptyMatrix();
+          minesweeper.plantMines();
+          minesweeper.populate();
+
+          const zeroCell = minesweeper.safeCells.filter(c => isZeroCell(c, minesweeper))[0]
+          minesweeper.revealSurroundings(zeroCell, true);
+          const hidden: number = countHiddenCells(minesweeper.matrix);
+
+          expect(hidden).to.be.greaterThan(0);
+        });
       });
     });
   });
