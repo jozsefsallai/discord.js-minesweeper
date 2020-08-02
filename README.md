@@ -64,6 +64,7 @@ minesweeper.start();
   * **mines** *(number)* - The number of mines in the mine field. Defaults to 10.
   * **emote** *(string)* - The emote used as a mine (without colons). Defaults to "boom".
   * **spaces** *(boolean)* - Specifies whether or not the emojis should be surrounded by spaces. Defaults to true.
+  * **zeroFirstCell** *(boolean)* - Whether or not the first cell revealed should always be a zero (and automatically reveal any surrounding safe cells). Does nothing if `revealFirstCell` is false. Defaults to true.
   * **revealFirstCell** *(boolean)* - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
   * **returnType** *(string)* - The type of the returned data.
 
