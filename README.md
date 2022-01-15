@@ -67,6 +67,7 @@ minesweeper.start();
   * **zeroFirstCell** *(boolean)* - Whether or not the first cell revealed should always be a zero (and automatically reveal any surrounding safe cells). Does nothing if `revealFirstCell` is false. Defaults to true.
   * **revealFirstCell** *(boolean)* - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
   * **returnType** *(string)* - The type of the returned data.
+  * **rng** *(() => number)* - The random number generator function used for placing mines. Must generate a number between 0 and 1. Defaults to `Math.random`.
 
 ### Returned Data
 
@@ -221,6 +222,22 @@ class MinesweeperCommand extends Command {
 
 module.exports = MinesweeperCommand;
 ```
+
+### Custom RNG (seeded Minesweeper)
+
+You can now pass in any function that returns a number between 0 and 1 as the random number generator function. With the following basic example, you can create a seeded Minesweeper:
+
+```js
+const seedrandom = require('seedrandom');
+
+const myrng = seedrandom('myseed');
+
+const minesweeper = new Minesweeper({
+  rng: myrng
+});
+```
+
+This will always generate the same Minesweeper game for the seed `myseed`.
 
 ## License
 

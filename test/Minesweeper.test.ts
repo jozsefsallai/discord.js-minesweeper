@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import seedrandom from 'seedrandom';
 import Minesweeper from '../src/Minesweeper';
 
 describe('Minesweeper', function () {
@@ -36,6 +37,26 @@ describe('Minesweeper', function () {
       expect(minesweeper.revealFirstCell).to.eql(true);
       expect(minesweeper.types.mine).to.eql('||:tada:||');
       expect(minesweeper.types.numbers[1]).to.eql('||:one:||');
+    });
+
+    it('should use custom RNG function', function () {
+      const rng = seedrandom('kozakura');
+      
+      const first = new Minesweeper({
+        rows: 10,
+        columns: 10,
+        mines: 20,
+        rng
+      });
+
+      const second = new Minesweeper({
+        rows: 10,
+        columns: 10,
+        mines: 20,
+        rng
+      });
+
+      expect(first.matrix).to.eql(second.matrix);
     });
   });
 

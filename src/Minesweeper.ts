@@ -8,7 +8,8 @@
  * @property {boolean} [revealFirstCell] - Whether or not the first cell should be revealed (like in regular Minesweeper). Defaults to FALSE.
  * @property {boolean} [zeroFirstCell] - Whether or not the first cell revealed should always be a zero (and automatically reveal any surrounding safe cells). Does nothing if `revealFirstCell` is false. Defaults to true.
  * @property {boolean} [spaces] - Specifies whether or not the emojis should be surrounded by spaces. Defaults to true.
- * @property {'emoji' | 'code' | 'matrix'} - The type of the returned data. Defaults to "emoji".
+ * @property {function} [rng] - Custom random number generator function. Must generate a number between 0 and 1. Defaults to Math.random().
+ * @property {'emoji' | 'code' | 'matrix'} [returnType] - The type of the returned data. Defaults to "emoji".
  */
 interface MinesweeperOpts {
   rows?: number;
@@ -18,6 +19,7 @@ interface MinesweeperOpts {
   revealFirstCell?: boolean;
   zeroFirstCell?: boolean;
   spaces?: boolean;
+  rng?: () => number;
   returnType?: 'emoji' | 'code' | 'matrix'; 
 }
 
@@ -51,8 +53,11 @@ class Minesweeper {
   public readonly spaces: boolean;
   public readonly revealFirstCell: boolean;
   public readonly zeroFirstCell: boolean;
-  public readonly safeCells: SafeCell[] = [];
   public readonly returnType: 'emoji' | 'code' | 'matrix';
+  
+  public rng: () => number;
+  
+  public readonly safeCells: SafeCell[] = [];
   public readonly types: CellTypes;
   public matrix: string[][];
 
@@ -62,14 +67,14 @@ class Minesweeper {
    * @param {MinesweeperOpts} opts - The options of the Minesweeper class.
    */
   constructor(opts: MinesweeperOpts | undefined = undefined) {
-    this.rows = (opts && opts.rows) || 9;
-    this.columns = (opts && opts.columns) || 9;
-    this.mines = (opts && opts.mines) || 10;
-    this.emote = (opts && opts.emote) || 'boom';
-    this.revealFirstCell = opts && opts.revealFirstCell !== undefined ? opts.revealFirstCell : false;
-    this.zeroFirstCell = opts && opts.zeroFirstCell !== undefined ? opts.zeroFirstCell : true;
-    this.spaces = opts && opts.spaces !== undefined ? opts.spaces : true;
-    this.returnType = (opts && opts.returnType) || 'emoji';
+    this.rows = opts?.rows || 9;
+    this.columns = opts?.columns || 9;
+    this.mines = opts?.mines || 10;
+    this.emote = opts?.emote || 'boom';
+    this.revealFirstCell = opts?.revealFirstCell ?? false;
+    this.zeroFirstCell = opts?.zeroFirstCell ?? true;
+    this.spaces = opts?.spaces ?? true;
+    this.returnType = opts?.returnType || 'emoji';
 
     this.matrix = [];
 
@@ -77,6 +82,8 @@ class Minesweeper {
       mine: this.spoilerize(this.emote),
       numbers: [ 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight' ].map(n => this.spoilerize(n))
     };
+
+    this.rng = opts?.rng ?? Math.random;
   }
 
   /**
@@ -105,8 +112,8 @@ class Minesweeper {
    */
   plantMines() {
     for (let i: number = 0; i < this.mines; i++) {
-      const x: number = Math.floor(Math.random() * this.rows);
-      const y: number = Math.floor(Math.random() * this.columns);
+      const x: number = Math.floor(this.rng() * this.rows);
+      const y: number = Math.floor(this.rng() * this.columns);
 
       if (this.matrix[x][y] === this.types.mine) {
         i--;
@@ -197,7 +204,7 @@ class Minesweeper {
 
     const zeroCells = this.safeCells.filter(c => this.matrix[c.x][c.y] === this.types.numbers[0]);
     if (this.zeroFirstCell && zeroCells.length > 0) {
-      const safeCell: SafeCell = zeroCells[Math.floor(Math.random() * zeroCells.length)];
+      const safeCell: SafeCell = zeroCells[Math.floor(this.rng() * zeroCells.length)];
 
       const x: number = safeCell.x;
       const y: number = safeCell.y;
@@ -209,7 +216,7 @@ class Minesweeper {
 
       return { x, y };
     } else {
-      const safeCell: SafeCell = this.safeCells[Math.floor(Math.random() * this.safeCells.length)];
+      const safeCell: SafeCell = this.safeCells[Math.floor(this.rng() * this.safeCells.length)];
 
       const x: number = safeCell.x;
       const y: number = safeCell.y;
